@@ -277,3 +277,13 @@ class Functions():
             tk.Label(self.misc, text=video_title,
                      font='arial 10').place(x=55, y=140)
             return False
+
+    def set_file_type(self, event):
+        """
+        FUNCIÓN:
+        Se escoge el tipo de formato de archivo.
+
+        :param event: Guarda el tipo de formato en una variable.
+        """
+        # Se obtiene la respuesta del tipo de formato.
+        self.file_type = event.widget.get()
