@@ -145,3 +145,30 @@ class Functions():
         # se retornará False.
         except pytube.exceptions.RegexMatchError:
             return False
+
+    def sort_resolutions(self, resolutions: list):
+        '''
+        FUNCIÓN:
+        Acomoda las resoluciones de mayor a menor.
+
+        :param resolutions: Guarda en una lista de resoluciones
+
+        :return sorted_resolutions: Retorna las resoluciones ordenadas.
+        '''
+        # En esta lista se guardarán las resoluciones de mayor a menor.
+        sorted_resolutions = []
+        # Se quita la 'p' de cada elemento para así trabajar con
+        # números enteros.
+        for i in range(len(resolutions)):
+            my_resolution = int(resolutions[i][:-1])
+            sorted_resolutions.append(my_resolution)
+        # Se acomodan los números de mayor a menor con sorted.
+        sorted_resolutions = sorted(sorted_resolutions, reverse=True)
+        # Luego, se vuelve a poner la 'p' nuevamente en cada elemento
+        # de la lista.
+        for i in range(len(sorted_resolutions)):
+            sorted_resolutions[i] = str(sorted_resolutions[i]) + 'p'
+        # Se regresan todas las resoluciones una vez ya se encuentren
+        # ordenadas.
+        return sorted_resolutions
+
