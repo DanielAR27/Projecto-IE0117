@@ -172,3 +172,33 @@ class Functions():
         # ordenadas.
         return sorted_resolutions
 
+    def get_resolutions(self, video: YouTube):
+        '''
+        FUNCIÓN:
+        Obtener las resoluciones disponibles dado como parámetro un
+        video de Youtube.
+
+        :param YouTube video: Guarda la información respectiva del video.
+
+        :return resolutions: Lista ordenada de mayor a menor.
+        '''
+        # En esta lista se guardarán las resoluciones
+        # disponibles para un video.
+        resolutions = []
+        # Con este ciclo se identificarán cuáles son las
+        # resoluciones disponibles.
+        for i in video.streams:
+            # Puede suceder que una resolución se repita o que aparezca como
+            # 'None', si alguno de estos dos casos sucede
+            # simplemente se ignorará y se procederá con el siguiente elemento.
+            if str(i.resolution) in resolutions or str(i.resolution) == 'None':
+                pass
+            # De no presentarse el error mencionado anteriormente entonces se
+            # agregará a la lista de resoluciones disponibles para un video.
+            else:
+                resolutions.append(str(i.resolution))
+        # Se acomodan las resoluciones de menor a mayor.
+        resolutions = self.sort_resolutions(resolutions)
+        # Se acomodan en orden numérico las resoluciones, desde la más baja
+        # hasta la más alta.
+        return resolutions
