@@ -2,7 +2,7 @@
 
 # LIBRERIAS UTILIZADAS
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, filedialog
 from pytube import YouTube
 import pytube
 from PIL import Image, ImageTk
@@ -408,3 +408,25 @@ class Functions():
             file_types_cb.place(x=10, y=100)
             file_types_cb.bind('<<ComboboxSelected>>', lambda event:
                                self.set_file_type(event))
+
+    def directoryLocation(self):
+        """
+        FUNCIÓN:
+        Preguntar por la dirección.
+        """
+        # Es una función estática.
+        # Se pregunta por la dirección del archivo.
+        filename = filedialog.askdirectory()
+        return filename
+
+    def insertPath(self, entry: tk.Entry):
+        """
+        FUNCIÓN:
+        Insertar la dirección y su path.
+
+        :param tk.Entry entry: Entrada del path.
+        """
+        # Se borra el texto que contenga
+        # y se introduce la dirección anterior.
+        entry.delete(0, 'end')
+        entry.insert(0, self.directoryLocation())
