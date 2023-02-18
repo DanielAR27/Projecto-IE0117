@@ -225,3 +225,55 @@ class Functions():
         # Se transforma la imagen en el formato adecuado.
         picture = ImageTk.PhotoImage(link_thumbnail)
         return picture
+
+    def title_fits(self, video_title):
+        """
+        FUNCIÓN:
+        Con esta función se verifica que el texto pueda alcanzar el
+        espacio para así poder acomodarlo según su longitud.
+
+        :param video_title: Título del video.
+
+        :return: True si el título se excede y False si no se excede.
+        """
+        # Lista donde se despliegará el texto según los espacios.
+        list_texto = video_title.split(' ')
+        # String que será usado como prueba para medir los caracteres.
+        str_measure = ''
+        # Variable donde se guardará el index de donde se
+        # debe separar el texto.
+        max_index = 0
+
+        for i in range(len(list_texto)):
+            # Si es la primer palabra, no se debe agregar espacio.
+            if i == 0:
+                str_measure = str_measure + list_texto[i]
+            # Cualquier otra palabra sí debe tener espacio.
+            else:
+                str_measure = str_measure + ' ' + list_texto[i]
+
+            # Si la longitud del texto supera los 70 caracteres entonces se
+            # ejecutará el siguiente bloque de código.
+            if len(str_measure) > 70:
+                # Se debe separar el texto en donde existan espacios.
+                nuevo_texto = str_measure.split(' ')
+                # La última palabra es la que está causando el problema, por
+                # que la longitud quedará hasta la penúltima palabra.
+                max_index = len(nuevo_texto) - 1
+                break
+
+        # Si la variable cambia es por que el texto supera el número máximo de
+        # caracteres permitidos.
+        if max_index != 0:
+            first_list = list_texto[:max_index]
+            second_list = list_texto[max_index:]
+            tk.Label(self.misc, text=' '.join(first_list),
+                     font='arial 10').place(x=52, y=140)
+            tk.Label(self.misc, text=' '.join(second_list),
+                     font='arial 10').place(x=10, y=160)
+            return True
+        # De no ser así, simplemente se pondrá el título por defecto.
+        else:
+            tk.Label(self.misc, text=video_title,
+                     font='arial 10').place(x=55, y=140)
+            return False
