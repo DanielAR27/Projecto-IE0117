@@ -5,6 +5,9 @@ import tkinter as tk
 from tkinter import messagebox
 from pytube import YouTube
 import pytube
+from PIL import Image, ImageTk
+import urllib.request
+import io
 
 
 class Messages():
@@ -202,3 +205,23 @@ class Functions():
         # Se acomodan en orden numérico las resoluciones, desde la más baja
         # hasta la más alta.
         return resolutions
+
+    def get_thumbnail(self, link):
+        """
+        FUNCIÓN:
+        Obtener el thumbnail de una imagen en base a su link sin tener
+        que descargarla.
+        :param link: Link de la imagen del video de YouTube.
+        :return picture: La imagen del video.
+        """
+        # Se lee la información de la imagen con la librería url lib requist.
+        with urllib.request.urlopen(link) as my_request:
+            raw_data = my_request.read()
+        # Se abre la imagen en base a la data recolectada.
+        link_thumbnail = Image.open(io.BytesIO(raw_data))
+        # Se hace la imagen más pequeña para que esta pueda
+        # caber en la ventana.
+        link_thumbnail = link_thumbnail.resize((160, 130))
+        # Se transforma la imagen en el formato adecuado.
+        picture = ImageTk.PhotoImage(link_thumbnail)
+        return picture
