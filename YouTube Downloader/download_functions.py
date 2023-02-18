@@ -3,6 +3,8 @@
 # LIBRERIAS UTILIZADAS
 import tkinter as tk
 from tkinter import messagebox
+from pytube import YouTube
+import pytube
 
 
 class Messages():
@@ -123,3 +125,23 @@ class Functions():
         self.video = None
         # Se crea un notificador de mensajes con la ayuda de la clase Messages.
         self.notifier = Messages(misc)
+
+    def check_video_exists(self, link: str):
+        '''
+        FUNCIÓN:
+        Verificar la existencia de un video.
+
+        :param str link: Link del video de YouTube.
+
+        :return my_video: Si el video existe o False si el video no se encontró
+        '''
+        # Se intentará crear un objeto de tipo YouTube.
+        # Si se puede crear, entonces será retornado.
+        try:
+            my_video = YouTube(link)
+            self.video = my_video
+            return my_video
+        # Si surge que el link no existe o no se encuentra
+        # se retornará False.
+        except pytube.exceptions.RegexMatchError:
+            return False
