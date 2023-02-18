@@ -2,7 +2,7 @@
 
 # LIBRERIAS UTILIZADAS
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 from pytube import YouTube
 import pytube
 from PIL import Image, ImageTk
@@ -287,3 +287,124 @@ class Functions():
         """
         # Se obtiene la respuesta del tipo de formato.
         self.file_type = event.widget.get()
+
+    def erase_widgets(self, maximum: int):
+        """
+        FUNCIÓN:
+        Borrar todos los widgets después de cierto número.
+
+        :param int maximum: número máximo de widgets.
+        """
+        # Se obtienen todos los elementos dentro del root.
+        wlist = self.misc.winfo_children()
+        # Si la longitud de elementos es mayor al máximo que se busca,
+        # entonces se van a eliminar
+        if len(wlist) != maximum:
+            # Se guarda en una variable la cantidad de veces a iterar por cada
+            # elemento adicional que exista.
+            ite_var = len(wlist) - maximum
+            wlist.reverse()
+            for i in range(ite_var):
+                wlist[i].destroy()
+        return wlist
+
+    def type_choice(self, event, resolutions: list, exceeding: bool):
+        """
+        FUNCIÓN:
+        Se escoge el tipo de formato de video.
+
+        :param list resolutions: lista de resoluciones.
+        :param bool exceeding: booleano que indica si se sobrepasó.
+        """
+        # Se obtiene la respuesta del tipo de formato.
+        self.type = event.widget.get()
+        # Estos datos deben ser vaciados para que no haya
+        # problemas luego al descargar.
+        self.file_type = ''
+        self.resolution = ''
+        # Si el título del video se excedió de caracteres, los elementos en la
+        # ventana serán un total de 12.
+        if exceeding is True:
+            elements = 13
+        # Si el título no se excedió, los elementos en la
+        # ventana serán un total de 11.
+        else:
+            elements = 12
+        # Si el formato es de video entonces se ejecutará todo el siguiente
+        # bloque de código.
+        if self.type == 'Video':
+            # Si hay más de 11 o 12 widgets, todas las añadidas recientemente
+            # serán eliminadas.
+            # Esto se hace debido a que se crean varias copias y esto puede
+            # sobrecargar la aplicación.
+            self.erase_widgets(elements)
+            # Se crea una caja para decidir la resolución de
+            # video que se quiere.
+            resolutions_cb = ttk.Combobox(self.misc, values=resolutions)
+            tk.Label(self.misc, text='Resolución').place(x=200, y=10)
+            resolutions_cb.place(x=200, y=40)
+            resolutions_cb.bind('<<ComboboxSelected>>', lambda event:
+                                self.resolution_choice(event, exceeding))
+        # Si el formato es de audio entonces se ejecutará todo el siguiente
+        # bloque de código.
+        else:
+            # Si hay más de 11 widgets, todas las añadidas
+            # recientemente serán eliminadas.
+            # Esto se hace debido a que se crean varias copias y esto puede
+            # sobrecargar la aplicación.
+            self.erase_widgets(elements)
+            # Se crea una variable en donde guardar el formato de archivo.
+            file_types_cb = ttk.Combobox(self.misc, values='mp3')
+            tk.Label(self.misc, text='Formato de archivo').place(x=200, y=10)
+            file_types_cb.place(x=200, y=40)
+            file_types_cb.bind('<<ComboboxSelected>>', lambda event:
+                               self.set_file_type(event))
+
+    def resolution_choice(self, event, exceeding: bool):
+        """
+        FUNCIÓN:
+        Se escoge el tipo de formato de resolución.
+
+        :param event: Guarda el tipo de formato en una variable
+        :param bool exceeding: booleano que indica si se sobrepasó.
+        """
+        # Se obtiene la respuesta de la resolución.
+        self.resolution = event.widget.get()
+        # Estos datos deben ser vaciados para que no haya
+        # problemas luego al descargar.
+        self.file_type = ''
+        # Si el título del video se excedió de caracteres, los elementos en la
+        # ventana serán un total de 14.
+        if exceeding is True:
+            elements = 15
+        # Si el título del video se excedió de caracteres, los elementos en la
+        # ventana serán un total de 13.
+        else:
+            elements = 14
+        # Si el formato de resolución es de 144p entonces se ejecutará todo el
+        # siguiente bloque de código.
+        if self.resolution == '144p':
+            # Si hay más de 13 widgets, todas las añadidas recientemente
+            # serán eliminadas.Esto se hace debido a que se crean varias
+            # copias y esto puede sobrecargar la aplicación.
+            self.erase_widgets(elements)
+            # Se crea una caja para decidir el formato de archivo.
+            file_types_cb = ttk.Combobox(self.misc, values=['3gp', 'mp4'])
+            tk.Label(self.misc, text='Formato de archivo').place(x=10, y=70)
+            file_types_cb.place(x=10, y=100)
+            file_types_cb.bind('<<ComboboxSelected>>', lambda event:
+                               self.set_file_type(event))
+        # Si el formato de resolución es cualquier otro entonces se ejecutará
+        # todo el siguiente bloque de código.
+        else:
+            # Si hay más de 13 widgets, todas las añadidas recientemente
+            # serán eliminadas.Esto se hace debido a que se crean varias
+            # copias y esto puede sobrecargar la aplicación.
+            self.erase_widgets(elements)
+            # Se crea una caja para decidir el formato de archivo, en este
+            # caso solo habrá formato mp4.
+            file_types_cb = ttk.Combobox(self.misc, values='mp4')
+            tk.Label(self.misc, text='Formato de archivo').place(x=10, y=70)
+            file_types_cb.place(x=10, y=100)
+            file_types_cb.bind('<<ComboboxSelected>>', lambda event:
+                               self.set_file_type(event))
