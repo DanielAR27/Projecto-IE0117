@@ -583,6 +583,10 @@ class Functions():
             if name is False:
                 video_name = self.video._title +\
                     '.' + self.file_type
+            # En caso contrario, el nombre será asignado a la variable
+            # recibida como parámetro.
+            else:
+                video_name = name
             # Se crea una lista de los streams de video que cumplen
             # con los requisitos para la descarga.
             download_list = self.video.streams.filter(
