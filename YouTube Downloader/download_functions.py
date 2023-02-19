@@ -479,3 +479,268 @@ class Functions():
         else:
             video_name = str(name) + '.' + str(extension)
             return video_name
+
+    def download_proccess(self, name: str, direction: str, bool_name: bool):
+        """
+        FUNCIÓN:
+        Facilitar el proceso de descarga según las necesidades del usuario.
+
+        :param str name: El valor del nombre para guardar el archivo.
+        :param str direction: El valor de la dirección en donde
+        guardar el archivo.
+        :param bool bool_name: El valor que determina si el nombre ya está
+        establecido o si hay que modificarlo de alguna manera.
+        """
+        # Si bool name es True (el nombre ya está establecido) se ejecutará
+        # el siguiente bloque:
+        if bool_name is True:
+            # Si el nombre es False (no hay nombre) se ejecuta
+            # el siguiente bloque:
+            if name is False:
+                # Se crea una lista de los streams de video que cumplen
+                # con los requisitos para la descarga.
+                download_list = self.video.streams.filter(
+                    res=self.resolution,
+                    type='video',
+                    progressive=True
+                    )
+                # Si la lista de descarga tiene cero elementos
+                # (está vacía), se procederá a intentar descargar
+                # pero sin audio.
+                if len(download_list) == 0:
+                    # Se intentará descargar el video en
+                    # la resolución solicitada pero sin audio.
+                    try:
+                        self.video.streams.filter(
+                            res=self.resolution,
+                            type='video'
+                        ).first().download(direction)
+                        self.notifier.no_audio_download()
+                    # Cualquier excepción que pueda afectar a la
+                    # descarga se alertará al usuario
+                    # (se tratan todas las excepciones posibles).
+                    except Exception:
+                        self.notifier.error_download()
+                # Si la lista de descarga no está vacía, se procederá a
+                # descargar el video con todos los requisitos solicitados.
+                else:
+                    # Se intentará descargar el video en
+                    # la resolución solicitada y con audio.
+                    try:
+                        download_list.first().download(direction)
+                        self.notifier.successful_download()
+                    # Cualquier excepción que pueda afectar a la
+                    # descarga se alertará al usuario
+                    # (se tratan todas las excepciones posibles).
+                    except Exception:
+                        self.notifier.error_download()
+            # Si el nombre existe, se agregará como un parámetro
+            # a la hora de descargar el video.
+            else:
+                # Se crea una lista de los streams de video que cumplen
+                # con los requisitos para la descarga.
+                download_list = self.video.streams.filter(
+                    res=self.resolution,
+                    type='video',
+                    progressive=True
+                    )
+                # Si la lista de descarga tiene cero elementos
+                # (está vacía), se procederá a intentar descargar
+                # pero sin audio.
+                if len(download_list) == 0:
+                    # Se intentará descargar el video en
+                    # la resolución solicitada pero sin audio.
+                    try:
+                        self.video.streams.filter(
+                            res=self.resolution,
+                            type='video'
+                        ).first().download(direction, name)
+                        self.notifier.no_audio_download()
+                    # Cualquier excepción que pueda afectar a la
+                    # descarga se alertará al usuario
+                    # (se tratan todas las excepciones posibles).
+                    except Exception:
+                        self.notifier.error_download()
+                # Si la lista de descarga no está vacía, se procederá a
+                # descargar el video con todos los requisitos solicitados.
+                else:
+                    # Se intentará descargar el video en
+                    # la resolución solicitada y con audio.
+                    try:
+                        download_list.first().download(direction, name)
+                        self.notifier.successful_download()
+                    # Cualquier excepción que pueda afectar a la
+                    # descarga se alertará al usuario
+                    # (se tratan todas las excepciones posibles).
+                    except Exception:
+                        self.notifier.error_download()
+        # Si set name es False (el nombre NO está establecido) se ejecutará
+        # el siguiente bloque:
+        else:
+            # Si el nombre es False (no hay nombre) el nombre
+            # será modificado.
+            if name is False:
+                video_name = self.video._title +\
+                    '.' + self.file_type
+            # Se crea una lista de los streams de video que cumplen
+            # con los requisitos para la descarga.
+            download_list = self.video.streams.filter(
+                res=self.resolution,
+                type='video',
+                progressive=True
+                )
+            # Si la lista de descarga tiene cero elementos
+            # (está vacía), se procederá a intentar descargar
+            # pero sin audio.
+            if len(download_list) == 0:
+                # Se intentará descargar el video en
+                # la resolución solicitada pero sin audio.
+                try:
+                    self.video.streams.filter(
+                        res=self.resolution,
+                        type='video'
+                    ).first().download(direction, video_name)
+                    self.notifier.no_audio_download()
+                # Cualquier excepción que pueda afectar a la
+                # descarga se alertará al usuario
+                # (se tratan todas las excepciones posibles).
+                except Exception:
+                    self.notifier.error_download()
+            # Si la lista de descarga no está vacía, se procederá a
+            # descargar el video con todos los requisitos solicitados.
+            else:
+                # Se intentará descargar el video en
+                # la resolución solicitada y con audio.
+                try:
+                    download_list.first().download(direction, video_name)
+                    self.notifier.successful_download()
+                # Cualquier excepción que pueda afectar a la
+                # descarga se alertará al usuario
+                # (se tratan todas las excepciones posibles).
+                except Exception:
+                    self.notifier.error_download()
+
+    def download_video(self):
+        """
+        FUNCIÓN:
+        Inicializar el proceso de descarga según los datos
+        obtenidos hasta ese momento.
+        """
+        # Lo primero que se debe hacer es verificar que exista
+        # una dirección en donde guardar el video.
+        my_direction = self.check_direction()
+        # Si la dirección es correcta (no retorna False), se procede a
+        # verificar los siguientes pasos.
+        if my_direction is not False:
+            # Si la respuesta del tipo de formato es Audio, se debe verificar
+            # que luego se elija el tipo de archivo.
+            if self.type == 'Audio':
+                # Si se obtiene respuesta al tipo de archivo, entonces se
+                # procederá a descargar según los datos que se encuentren.
+                if self.file_type == 'mp3':
+                    # Se obtendrá el nombre mediante la ayuda de una función.
+                    video_name = self.set_name(self.file_name.get(),
+                                               self.file_type)
+                    # Si se obtiene False, el nombre será modificado.
+                    if video_name is False:
+                        video_name = self.video._title +\
+                            '.' + self.file_type
+                    # Se intentará descargar el audio en
+                    # formato mp3 y sin audio.
+                    try:
+                        self.video.streams.filter(only_audio=True).first(
+                        ).download(my_direction, video_name)
+                        self.notifier.successful_download()
+                    # Cualquier excepción que pueda afectar a la
+                    # descarga se alertará al usuario
+                    # (se tratan todas las excepciones posibles).
+                    except Exception:
+                        self.notifier.error_download()
+                # Si no se logra obtener una respuesta, saltará
+                # un mensaje de advertencia.
+                else:
+                    self.notifier.advice_chose_file_type()
+            # Si la respuesta del tipo de formato es Video, se debe verificar
+            # que luego se elija el tipo de archivo.
+            elif self.type == 'Video':
+                # Si no se ha elegido una resolución, saltará un
+                # mensaje de advertencia.
+                if self.resolution == '':
+                    self.notifier.advice_chose_resolution()
+                # Si la resolución es automática, se procedará a hacer
+                # la descarga de manera automática.
+                elif self.resolution == 'Auto Quality':
+                    # Si se obtiene respuesta al tipo de archivo, entonces se
+                    # procederá a descargar según los datos que se encuentren.
+                    if self.file_type == 'mp4':
+                        video_name = self.set_name(self.file_name.get(),
+                                                   self.file_type)
+                        # Si se obtiene False, se descargará sin necesidad de
+                        # haber otorgado un nombre.
+                        if video_name is False:
+                            # Se intentará descargar el video en
+                            # formato mp4 y con la resolución más alta.
+                            try:
+                                self.video.streams.get_highest_resolution(
+                                                ).download(my_direction)
+                                self.notifier.successful_download()
+                            # Cualquier excepción que pueda afectar a la
+                            # descarga se alertará al usuario
+                            # (se tratan todas las excepciones posibles).
+                            except Exception:
+                                self.notifier.error_download()
+                        # Si se pudo obtener un nombre, se descargará según
+                        # el nombre que haya sido otorgado.
+                        else:
+                            # Se intentará descargar el video en
+                            # formato mp4 y con la resolución más alta.
+                            try:
+                                self.video.streams.get_highest_resolution(
+                                    ).download(my_direction, video_name)
+                                self.notifier.successful_download()
+                            # Cualquier excepción que pueda afectar a la
+                            # descarga se alertará al usuario
+                            # (se tratan todas las excepciones posibles).
+                            except Exception:
+                                self.notifier.error_download()
+                    # Si no se logra obtener una respuesta, saltará
+                    # un mensaje de advertencia.
+                    else:
+                        self.notifier.advice_chose_file_type()
+                # La resolución 144p tendrá dos tipos de archivo.
+                elif self.resolution == '144p':
+                    # Si se obtiene respuesta al tipo de archivo y verificar
+                    # que este sea mp4, entonces se procederá a descargar
+                    #  según los datos que se encuentren.
+                    if self.file_type == 'mp4':
+                        video_name = self.set_name(self.file_name.get(),
+                                                   self.file_type)
+                        self.download_proccess(video_name, my_direction, True)
+                    # Si se obtiene respuesta al tipo de archivo y verificar
+                    # que este sea 3gp, entonces se procederá a descargar
+                    #  según los datos que se encuentren.
+                    elif self.file_type == '3gp':
+                        video_name = self.set_name(self.file_name.get(),
+                                                   self.file_type)
+                        self.download_proccess(video_name, my_direction, False)
+                    # Si no se logra obtener una respuesta, saltará
+                    # un mensaje de advertencia.
+                    else:
+                        self.notifier.advice_chose_file_type()
+                # Todas las demás resoluciones solo tendrán un tipo
+                # de archivo (mp4) y lo único a destacar será la resolución.
+                else:
+                    # Si se obtiene respuesta al tipo de archivo, entonces se
+                    # procederá a descargar según los datos que se encuentren.
+                    if self.file_type == 'mp4':
+                        video_name = self.set_name(self.file_name.get(),
+                                                   self.file_type)
+                        self.download_proccess(video_name, my_direction, True)
+                    # Si no se logra obtener una respuesta,
+                    # saltará un mensaje de advertencia.
+                    else:
+                        self.notifier.advice_chose_file_type()
+            # Si no hay respuesta del tipo de formato, entonces se
+            # notificará al usuario.
+            else:
+                self.notifier.advice_chose_type()
