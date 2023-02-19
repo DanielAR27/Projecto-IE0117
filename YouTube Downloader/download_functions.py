@@ -8,6 +8,7 @@ import pytube
 from PIL import Image, ImageTk
 import urllib.request
 import io
+import os
 
 
 class Messages():
@@ -430,3 +431,51 @@ class Functions():
         # y se introduce la dirección anterior.
         entry.delete(0, 'end')
         entry.insert(0, self.directoryLocation())
+
+    def check_direction(self):
+        """
+        FUNCIÓN:
+        Revisar si la dirección se encuentra vacía.
+
+        :return self.location.get(): Si la dirección existe,
+        o False si está vacía o si no existe.
+        """
+        # Se obtiene el nombre de la dirección.
+
+        # Si la dirección está vacía, surge un mensaje de advertencia para
+        # que se solicite una dirección.
+        if self.location.get() == '':
+            self.notifier.advice_choose_location()
+            return False
+        # De no ser así, se regresará el valor de True.
+        else:
+            # Se debe verificar que la dirección exista.
+            path_existance = os.path.exists(self.location.get())
+            # Si la dirección no existe entonces surge un mensaje
+            # de advertencia para que se ponga dirección que exista.
+            if path_existance is False:
+                # ARREGLAR ESTO.
+                self.notifier.advice_nonexistent_location()
+                return False
+            # Si la dirección existe entonces se retornará
+            # la dirección como valor.
+            else:
+                return self.location.get()
+
+    def set_name(self, name, extension):
+        """
+        FUNCIÓN:
+        Se escoge el nombre para el archivo que se va a descargar.
+
+        :param name: Guarda el nombre del archivo.
+        :param extension: Guarda el formato del archivo a descargar.
+
+        :return video_name: Si no está vacío o False si está vacío o
+        """
+        # Si el nombre está vacío, se retorna False.
+        if name == '':
+            return False
+        # Si el nombre no está vacío se devolverá el nombre más la extensión.
+        else:
+            video_name = str(name) + '.' + str(extension)
+            return video_name
