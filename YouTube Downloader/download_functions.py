@@ -9,6 +9,7 @@ from PIL import Image, ImageTk
 import urllib.request
 import io
 import os
+import tkinter_root as tr
 
 
 class Messages():
@@ -744,3 +745,11 @@ class Functions():
             # notificará al usuario.
             else:
                 self.notifier.advice_chose_type()
+
+    def open_again(self):
+        '''
+        FUNCIÓN:
+        Abrir una nueva ventana y cerrar la actual.
+        '''
+        self.misc.destroy()  # Destruyendo ventana.
+        tr.Window()  # Abriendo nueva ventana.
