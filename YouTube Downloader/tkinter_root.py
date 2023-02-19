@@ -9,7 +9,7 @@ class Window():
     def __init__(self):
         # Se crea un objeto de tipo Tkinter, este será por así decirlo nuestro
         # root en donde guardaremos todas las posibles configuraciones.
-        self.root = tk.Tk()
+        self.root = tk.Tk(className='YT Downloader')
         # Se crea un objeto de tipo Download Functions para posteriormente
         # utilizar algunas funciones útiles dentro del root.
         utilities = df.Functions(self.root)
