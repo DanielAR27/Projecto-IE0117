@@ -638,8 +638,6 @@ class Functions():
                     # Se intentará descargar el audio en
                     # formato mp3 y sin audio.
                     try:
-                        print("Nombre del video: {}".format(video_name))
-                        print("Dirección: {}".format(my_direction))
                         self.video.streams.filter(only_audio=True).first(
                         ).download(my_direction, video_name)
                         self.notifier.successful_download()
@@ -648,7 +646,6 @@ class Functions():
                     # (se tratan todas las excepciones posibles).
                     except Exception:
                         self.notifier.error_download()
-                    self.download_proccess(video_name, my_direction)
                 # Si no se logra obtener una respuesta, saltará
                 # un mensaje de advertencia.
                 else:
