@@ -648,6 +648,7 @@ class Functions():
                     # (se tratan todas las excepciones posibles).
                     except Exception:
                         self.notifier.error_download()
+                    self.download_proccess(video_name, my_direction)
                 # Si no se logra obtener una respuesta, saltará
                 # un mensaje de advertencia.
                 else:
