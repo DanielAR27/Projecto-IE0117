@@ -560,8 +560,8 @@ class Functions():
                 video_name = video_name.replace('/', '')
                 # Se mandad una notificación del cambio.
                 self.notifier.name_modified()
-                # Se agrega la extensión al nombre del video.
-                video_name = video_name + '.' + str(self.file_type)
+            # Se agrega la extensión al nombre del video.
+            video_name = video_name + '.' + str(self.file_type)
         # En caso contrario, el nombre será asignado a la variable
         # recibida como parámetro.
         else:
@@ -625,7 +625,29 @@ class Functions():
                     # Se obtendrá el nombre mediante la ayuda de una función.
                     video_name = self.set_name(self.file_name.get(),
                                                self.file_type)
-                    self.download_proccess(video_name, my_direction)
+                    # Si se obtiene False, el nombre será modificado.
+                    if video_name is False:
+                        video_name = str(self.video._title)
+                        if '/' in video_name:
+                            # Se modifica el título del video.
+                            video_name = video_name.replace('/', '')
+                            # Se mandad una notificación del cambio.
+                            self.notifier.name_modified()
+                        # Se agrega la extensión al nombre del video.
+                        video_name = video_name + '.' + str(self.file_type)
+                    # Se intentará descargar el audio en
+                    # formato mp3 y sin audio.
+                    try:
+                        print("Nombre del video: {}".format(video_name))
+                        print("Dirección: {}".format(my_direction))
+                        self.video.streams.filter(only_audio=True).first(
+                        ).download(my_direction, video_name)
+                        self.notifier.successful_download()
+                    # Cualquier excepción que pueda afectar a la
+                    # descarga se alertará al usuario
+                    # (se tratan todas las excepciones posibles).
+                    except Exception:
+                        self.notifier.error_download()
                 # Si no se logra obtener una respuesta, saltará
                 # un mensaje de advertencia.
                 else:
@@ -643,6 +665,8 @@ class Functions():
                     # Si se obtiene respuesta al tipo de archivo, entonces se
                     # procederá a descargar según los datos que se encuentren.
                     if self.file_type == 'mp4':
+                        # Se obtendrá el nombre mediante la ayuda
+                        # de una función.
                         video_name = self.set_name(self.file_name.get(),
                                                    self.file_type)
                         # Si se obtiene False, se descargará sin necesidad de
@@ -683,6 +707,8 @@ class Functions():
                     # que este sea mp4 o 3gp, entonces se procederá a descargar
                     #  según los datos que se encuentren.
                     if self.file_type == 'mp4' or self.file_type == '3gp':
+                        # Se obtendrá el nombre mediante la ayuda
+                        # de una función.
                         video_name = self.set_name(self.file_name.get(),
                                                    self.file_type)
                         self.download_proccess(video_name, my_direction)
@@ -696,6 +722,8 @@ class Functions():
                     # Si se obtiene respuesta al tipo de archivo, entonces se
                     # procederá a descargar según los datos que se encuentren.
                     if self.file_type == 'mp4':
+                        # Se obtendrá el nombre mediante la ayuda
+                        # de una función.
                         video_name = self.set_name(self.file_name.get(),
                                                    self.file_type)
                         self.download_proccess(video_name, my_direction)
