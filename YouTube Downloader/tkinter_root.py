@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 # LIBRERIAS UTILIZADAS
 import tkinter as tk
 import download_functions as df

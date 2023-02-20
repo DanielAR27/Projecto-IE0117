@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 # LIBRERIAS UTILIZADAS
 import tkinter as tk
 from tkinter import messagebox, ttk, filedialog
