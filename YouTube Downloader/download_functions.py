@@ -25,17 +25,19 @@ class Messages():
         FUNCIÓN:
         Mensaje de aviso de elegir una dirección.
         '''
-        messagebox.showinfo('Advertencia', ('Debe elegir una dirección'
-                                            ' donde guardar su video.'))
+        messagebox.showinfo('Advertencia',
+                            'Debe elegir una dirección '
+                            'donde guardar su video.')
 
     def advice_nonexistent_location(self):
         '''
         FUNCIÓN:
         Mensaje de aviso si una dirección no existe.
         '''
-        messagebox.showinfo('Advertencia', ('La dirección no se ha '
-                                            'encontrado,'
-                                            'intente otra dirección.'))
+        messagebox.showinfo('Advertencia',
+                            'La dirección no se ha '
+                            'encontrado, '
+                            'intente otra dirección.')
 
     def successful_download(self):
         '''
@@ -70,7 +72,8 @@ class Messages():
         FUNCIÓN:
         Mensaje de aviso para elegir un tipo de formato general.
         """
-        messagebox.showinfo('Advertencia', 'Debe elegir un formato de video.')
+        messagebox.showinfo('Advertencia',
+                            'Debe elegir un formato de video.')
 
     def advice_chose_resolution(self):
         """
@@ -93,9 +96,21 @@ class Messages():
         FUNCIÓN:
         Mensaje de aviso para corregir el link.
         """
-        messagebox.showinfo('Advertencia', ('Ha ocurrido un error, '
-                                            'verifique que puso bien su '
-                                            'link.'))
+        messagebox.showinfo('Advertencia',
+                            'Ha ocurrido un error, '
+                            'verifique que puso bien su '
+                            'link.')
+
+    def age_restricted(self):
+        """
+        FUNCIÓN:
+        Mensaje de aviso por si un video tiene una restricción de edad.
+        """
+        messagebox.showinfo('Advertencia',
+                            'El video que desea descargar contiene '
+                            'una restricción establecida por YouTube. '
+                            'No es posible descargarlo, intente de nuevo '
+                            'con otro link u otro video.')
 
 
 class Functions():
@@ -164,7 +179,13 @@ class Functions():
         # números enteros.
         for i in range(len(resolutions)):
             my_resolution = int(resolutions[i][:-1])
-            sorted_resolutions.append(my_resolution)
+            # Si una resolución es mayor 1080p, no será incluida debido a que
+            # esta puede dar problemas con la descarga.
+            if my_resolution > 1080:
+                pass
+            # En caso contrario, debe ser agregada.
+            else:
+                sorted_resolutions.append(my_resolution)
         # Se acomodan los números de mayor a menor con sorted.
         sorted_resolutions = sorted(sorted_resolutions, reverse=True)
         # Luego, se vuelve a poner la 'p' nuevamente en cada elemento
@@ -188,23 +209,32 @@ class Functions():
         # En esta lista se guardarán las resoluciones
         # disponibles para un video.
         resolutions = []
-        # Con este ciclo se identificarán cuáles son las
-        # resoluciones disponibles.
-        for i in video.streams:
-            # Puede suceder que una resolución se repita o que aparezca como
-            # 'None', si alguno de estos dos casos sucede
-            # simplemente se ignorará y se procederá con el siguiente elemento.
-            if str(i.resolution) in resolutions or str(i.resolution) == 'None':
-                pass
-            # De no presentarse el error mencionado anteriormente entonces se
-            # agregará a la lista de resoluciones disponibles para un video.
-            else:
-                resolutions.append(str(i.resolution))
-        # Se acomodan las resoluciones de menor a mayor.
-        resolutions = self.sort_resolutions(resolutions)
-        # Se acomodan en orden numérico las resoluciones, desde la más baja
-        # hasta la más alta.
-        return resolutions
+        # Se intentará revisar los streams del video.
+        try:
+            # Con este ciclo se identificarán cuáles son las
+            # resoluciones disponibles.
+            for i in video.streams:
+                # Puede suceder que una resolución se repita o que aparezca
+                # como 'None', si alguno de estos dos casos sucede simplemente
+                #  se ignorará y se procederá con el siguiente elemento.
+                if (str(i.resolution) in resolutions
+                        or str(i.resolution) == 'None'):
+                    pass
+                # De no presentarse el error mencionado anteriormente entonces
+                # se agregará a la lista de resoluciones disponibles para
+                #  un video.
+                else:
+                    resolutions.append(str(i.resolution))
+            # Se acomodan las resoluciones de menor a mayor.
+            resolutions = self.sort_resolutions(resolutions)
+            # Se acomodan en orden numérico las resoluciones, desde la más baja
+            # hasta la más alta.
+            return resolutions
+        # Si al revisar los streams surge una excepción de tipo "KeyError" se
+        # debe a que el video contiene una restricción y no puede ser
+        # descargado. Esto es algo especificamente de la librería de pytube.
+        except KeyError:
+            return False
 
     def get_thumbnail(self, link):
         """
@@ -774,93 +804,101 @@ class Functions():
         if my_video is not False:
             # Se obtienen las resoluciones disponibles para el video.
             resolutions = self.get_resolutions(my_video)
-            # Se inserta la calidad automática.
-            resolutions.insert(0, 'Auto Quality')
+            if resolutions is False:
+                self.notifier.age_restricted()
+            else:
+                # Se inserta la calidad automática.
+                resolutions.insert(0, 'Auto Quality')
 
-            # Se crea una lista donde se almacenan todos los "widgets"
-            # de la aplicación.
-            wlist = self.misc.winfo_children()
-            # Se vacía toda la ventana para luego poder insertar cosas nuevas.
-            # Para ello, se debe vaciar la lista de los widgets.
-            for widge in wlist:
-                widge.destroy()
+                # Se crea una lista donde se almacenan todos los "widgets"
+                # de la aplicación.
+                wlist = self.misc.winfo_children()
+                # Se vacía toda la ventana para luego poder insertar cosas
+                # nuevas. Para ello, se debe vaciar la lista de los widgets.
+                for widge in wlist:
+                    widge.destroy()
 
-            # Se obtiene el link del thumbnail del video de YouTube.
-            thumbnail_link = my_video.thumbnail_url
-            # Se obtiene la imagen del video de youtube mediante
-            # su link de YouTube.
-            my_thumbnail = self.get_thumbnail(thumbnail_link)
-            # Se despliega en la ventana la imagen del video solicitado.
-            th_picture = tk.Label(self.misc, image=my_thumbnail)
-            th_picture.image = my_thumbnail
-            th_picture.place(x=405, y=5)
+                # Se obtiene el link del thumbnail del video de YouTube.
+                thumbnail_link = my_video.thumbnail_url
+                # Se obtiene la imagen del video de youtube mediante
+                # su link de YouTube.
+                my_thumbnail = self.get_thumbnail(thumbnail_link)
+                # Se despliega en la ventana la imagen del video solicitado.
+                th_picture = tk.Label(self.misc, image=my_thumbnail)
+                th_picture.image = my_thumbnail
+                th_picture.place(x=405, y=5)
 
-            # Se despliega en la ventana el nombre del video solicitado.
-            tk.Label(self.misc, text='Video:',
-                     font='arial 10 bold').place(x=10, y=140)
-            # Este puede crear de 1 a 2 etiquetas dependiendo del nombre
-            # del título, por lo que es importante para el orden
-            # de los elementos de la ventana para más tarde hacer que el título
-            # pueda encajar bien.
-            title_exceeds = self.title_fits(my_video._title)
+                # Se despliega en la ventana el nombre del video solicitado.
+                tk.Label(self.misc, text='Video:',
+                         font='arial 10 bold').place(x=10, y=140)
+                # Este puede crear de 1 a 2 etiquetas dependiendo del nombre
+                # del título, por lo que es importante para el orden
+                # de los elementos de la ventana
+                # para más tarde hacer que el título pueda encajar bien.
+                title_exceeds = self.title_fits(my_video._title)
 
-            # Se crea una caja para dedicir el tipo de formato que se quiere.
-            types_cb = ttk.Combobox(self.misc, values=['Video', 'Audio'])
-            # Se guarda la referencia del tipo de formato en el init.
-            self.type = str(types_cb.get())
-            # Se despliega en la ventana el nombre de los formatos disponibles.
-            tk.Label(self.misc, text='Formato de video').place(x=10, y=10)
-            types_cb.place(x=10, y=40)
-            types_cb.bind('<<ComboboxSelected>>', lambda event:
-                          self.type_choice(event, resolutions,
-                                           title_exceeds))
+                # Se crea una caja para dedicir el tipo
+                #  de formato que se quiere.
+                types_cb = ttk.Combobox(self.misc, values=['Video', 'Audio'])
+                # Se guarda la referencia del tipo de formato en el init.
+                self.type = str(types_cb.get())
+                # Se despliega en la ventana el nombre
+                #  de los formatos disponibles.
+                tk.Label(self.misc, text='Formato de video').place(x=10, y=10)
+                types_cb.place(x=10, y=40)
+                types_cb.bind('<<ComboboxSelected>>',
+                              lambda event:
+                              self.type_choice(event,
+                                               resolutions,
+                                               title_exceeds))
 
-            # Se crea una variable en donde guardar el nombre para el archivo
-            # si es que el usuario desea renombrarlo. Si este espacio queda
-            # vacío, se pondrá el nombre por defecto del video.
-            f_entry = tk.Entry(self.misc, width=50)
-            # Se guarda la referencia del tipo de archivo en el init.
-            self.file_name = f_entry
-            # Se despliega en la ventana la solicitud para
-            #  el nombre del archivo.
-            tk.Label(self.misc, text='Nombre del archivo:',
-                     font='arial 10 bold').place(x=10, y=180)
-            f_entry.place(x=150, y=182)
+                # Se crea una variable en donde guardar el nombre para el
+                # archivo si es que el usuario desea renombrarlo. Si este
+                #  espacio queda vacío, se pondrá el nombre por defecto
+                #  del video.
+                f_entry = tk.Entry(self.misc, width=50)
+                # Se guarda la referencia del tipo de archivo en el init.
+                self.file_name = f_entry
+                # Se despliega en la ventana la solicitud para
+                #  el nombre del archivo.
+                tk.Label(self.misc, text='Nombre del archivo:',
+                         font='arial 10 bold').place(x=10, y=180)
+                f_entry.place(x=150, y=182)
 
-            # Se crea una variable en donde guardar la dirección del video.
-            my_location = tk.Entry(self.misc, width=48)
-            # Se guarda la referencia de la dirección en el init.
-            self.location = my_location
-            # Se despliega en la ventana la solicitud para
-            # la ubicación en donde guardar el archivo.
-            tk.Label(self.misc, text='Dirección:',
-                     font='arial 10 bold').place(x=10, y=220)
-            my_location.place(x=85, y=222)
-            location_button = tk.Button(self.misc, text='Elegir', width=10,
-                                        command=lambda:
-                                        self.insertPath(my_location))
-            location_button.place(x=482, y=220)
+                # Se crea una variable en donde guardar la dirección del video.
+                my_location = tk.Entry(self.misc, width=48)
+                # Se guarda la referencia de la dirección en el init.
+                self.location = my_location
+                # Se despliega en la ventana la solicitud para
+                # la ubicación en donde guardar el archivo.
+                tk.Label(self.misc, text='Dirección:',
+                         font='arial 10 bold').place(x=10, y=220)
+                my_location.place(x=85, y=222)
+                location_button = tk.Button(self.misc, text='Elegir', width=10,
+                                            command=lambda:
+                                            self.insertPath(my_location))
+                location_button.place(x=482, y=220)
 
-            # Se crea un botón para proceder con la descarga del video.
-            download_button = tk.Button(self.misc, text='Descargar',
-                                        bg='green',
-                                        foreground='white', padx=2,
-                                        command=lambda:
-                                        self.download_video())
-            download_button.place(x=190, y=270)
-            # Se crea una botón para abrir una nueva ventana del video.
-            again_button = tk.Button(self.misc, text='Nueva Descarga',
-                                     bg='brown',
-                                     foreground='white', padx=2,
-                                     command=lambda:
-                                     self.open_again())
-            again_button.place(x=290, y=270)
+                # Se crea un botón para proceder con la descarga del video.
+                download_button = tk.Button(self.misc, text='Descargar',
+                                            bg='green',
+                                            foreground='white', padx=2,
+                                            command=lambda:
+                                            self.download_video())
+                download_button.place(x=190, y=270)
+                # Se crea una botón para abrir una nueva ventana del video.
+                again_button = tk.Button(self.misc, text='Nueva Descarga',
+                                         bg='brown',
+                                         foreground='white', padx=2,
+                                         command=lambda:
+                                         self.open_again())
+                again_button.place(x=290, y=270)
 
-            # NOTA: Cada elemento de Tkinter (Button, Entry, Label o Combobox)
-            # fue contado de manera manual, ya que el número de elementos es
-            # necesario para luego crear más elementos sin crear copias y así
-            # que el número de elementos sea exacto. (Esto se ve en
-            # funciones posteriores).
+                # NOTA: Cada elemento de Tkinter (Button, Entry, Label
+                #  o Combobox) fue contado de manera manual, ya que el número
+                #  de elementos es necesario para luego crear más elementos
+                #  sin crear copias y así que el número de elementos sea
+                # exacto. (Esto se ve en funciones posteriores).
         # En caso de que se retorne False entonces se emitirá una advertencia.
         else:
             self.notifier.advice_nonexistent_link()
